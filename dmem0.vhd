@@ -191,7 +191,7 @@ END SYN;
 -- Retrieval info: CONNECT: q 0 0 16 0 @q_a 0 0 16 0
 -- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0.vhd TRUE
 -- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0.inc FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0.cmp TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0.bsf TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0_inst.vhd TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0.cmp FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0.bsf FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dmem0_inst.vhd FALSE
 -- Retrieval info: LIB_FILE: altera_mf
