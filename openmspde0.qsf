@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Cyclone IV E"
 set_global_assignment -name DEVICE EP4CE22F17C6
-set_global_assignment -name TOP_LEVEL_ENTITY openMSP430_fpga_top
+set_global_assignment -name TOP_LEVEL_ENTITY OpenMSP430_fpga_top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "11:43:38  NOVEMBER 14, 2013"
 set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
@@ -49,17 +49,15 @@ set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulati
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
-set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/altera_de1_board/rtl/verilog/io_mux.v"
-set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/xilinx_diligent_s3board/rtl/verilog/omsp_uart.v"
+#set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/altera_de1_board/rtl/verilog/io_mux.v"
+#set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/xilinx_diligent_s3board/rtl/verilog/omsp_uart.v"
+set_global_assignment -name VERILOG_FILE "openMSP430.v"
 set_global_assignment -name SDC_FILE openmspde0.out.sdc
 set_global_assignment -name VHDL_FILE openMSP430_fpga_top.vhd
 set_global_assignment -name QIP_FILE dmem0.qip
 set_global_assignment -name QIP_FILE pmem0.qip
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog/periph"
-set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog"
+#set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog/periph"
+#set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog"
 
 # Pin & Location Assignments
 # ==========================
@@ -395,4 +393,8 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DRAM_DQM
 set_global_assignment -name SDC_FILE openmspde0.sdc
 set_global_assignment -name VHDL_FILE config.vhd
 
+
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
