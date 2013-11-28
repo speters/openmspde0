@@ -40,7 +40,7 @@ entity openMSP430_fpga_top is
 
 		--//////////// Accelerometer and EEPROM //////////
 		G_SENSOR_CS_N : out std_logic;
-		G_SENSOR_inT  : in std_logic;
+		G_SENSOR_INT  : in std_logic;
 		I2C_SCLK 	  : out std_logic;
 		I2C_SDAT 	  : inout std_logic;
 
@@ -53,15 +53,15 @@ entity openMSP430_fpga_top is
 		--//////////// GPIO //////////
 		-- //////////// upper GPIO header //////////
 		GPIO_0		: inout std_logic_vector(33 downto 0);
-		GPIO_0_in 	: in std_logic_vector(1 downto 0);
+		GPIO_0_IN 	: in std_logic_vector(1 downto 0);
 
 		-- //////////// lower GPIO header //////////			
 		GPIO_1		: out std_logic_vector(33 downto 0);	  
-		GPIO_1_in 	: in std_logic_vector(1 downto 0);
+		GPIO_1_IN 	: in std_logic_vector(1 downto 0);
 
 		-- //////////// 2x13 GPIO header //////////
 		GPIO_2 		  : inout std_logic_vector(12 downto 0);
-		GPIO_2_in 	: in std_logic_vector(2 downto 0)
+		GPIO_2_IN 	: in std_logic_vector(2 downto 0)
 	);
 end openMSP430_fpga_top;
 
@@ -87,7 +87,7 @@ architecture RTL of openMSP430_fpga_top is
 			irq_acc	: out std_logic_vector(13 downto 0);	-- interrupt request accepted (one-hot signal)
 			lfxt_enable	: out std_logic;	-- ASIC ONLY: Low frequency oscillator enable
 			lfxt_wkup	: out std_logic;	-- ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
-			mclk	: out std_logic;	-- openMSP430_fpga_top system clock
+			mclk	: out std_logic;	-- main system clock
 			per_addr	: out std_logic_vector(PER_MSB downto 0);	-- Peripheral address
 			per_din	: out std_logic_vector(15 downto 0);	-- Peripheral data input
 			per_we	: out std_logic_vector(1 downto 0);	-- Peripheral write enable (high active)
@@ -96,7 +96,7 @@ architecture RTL of openMSP430_fpga_top is
 			pmem_cen	: out std_logic;	-- Program Memory chip enable (low active)
 			pmem_din	: out std_logic_vector(15 downto 0);	-- Program Memory data input (optional)
 			pmem_wen	: out std_logic_vector(1 downto 0);	-- Program Memory write enable (low active) (optional)
-			puc_rst	: out std_logic;	-- openMSP430_fpga_top system reset
+			puc_rst	: out std_logic;	-- main system reset
 			smclk	: out std_logic;	-- ASIC ONLY: SMCLK
 			smclk_en	: out std_logic;	-- FPGA ONLY: SMCLK enable
 
@@ -156,7 +156,7 @@ architecture RTL of openMSP430_fpga_top is
 			per_dout		: out std_logic_vector(15 downto 0);	-- Peripheral data output
 			
 			-- INPUTs
-			mclk		: in std_logic;							-- openMSP430_fpga_top system clock
+			mclk		: in std_logic;							-- main system clock
 			p1_din	: in std_logic_vector(7 downto 0);	-- Port 1 data input
 			p2_din	: in std_logic_vector(7 downto 0);	-- Port 2 data input
 			p3_din	: in std_logic_vector(7 downto 0);	-- Port 3 data input
@@ -167,7 +167,7 @@ architecture RTL of openMSP430_fpga_top is
 			per_din	: in std_logic_vector(15 downto 0); -- Peripheral data input
 			per_en	: in std_logic;							-- Peripheral enable (high active)
 			per_we	: in std_logic_vector(1 downto 0);	-- Peripheral write enable (high active)
-			puc_rst	: in std_logic								-- openMSP430_fpga_top system reset
+			puc_rst	: in std_logic								-- main system reset
 		);
 	end component;
 
@@ -189,12 +189,12 @@ architecture RTL of openMSP430_fpga_top is
         dbg_freeze  : in  std_logic;    -- Freeze Timer A counter
         inclk   : in  std_logic;    -- inCLK external timer clock (SLOW)
         irq_ta0_acc : in  std_logic;    -- interrupt request TACCR0 accepted
-        mclk    : in  std_logic;    -- openMSP430_fpga_top system clock
+        mclk    : in  std_logic;    -- main system clock
         per_addr    : in  std_logic_vector(PER_MSB downto 0);    -- Peripheral address
         per_din : in  std_logic_vector(15 downto 0);    -- Peripheral data input
         per_en  : in  std_logic;    -- Peripheral enable (high active)
         per_we  : in  std_logic_vector(1 downto 0); -- Peripheral write enable (high active)
-        puc_rst : in  std_logic;    -- openMSP430_fpga_top system reset
+        puc_rst : in  std_logic;    -- main system reset
         smclk_en    : in  std_logic;    -- SMCLK enable (from CPU)
         ta_cci0a    : in  std_logic;    -- Timer A capture 0 input A
         ta_cci0b    : in  std_logic;    -- Timer A capture 0 input B
@@ -219,12 +219,12 @@ architecture RTL of openMSP430_fpga_top is
 			per_dout :  out std_logic_vector( 15  downto 0  );	-- Peripheral data output
 			uart_txd :  out std_logic;	-- UART Data Transmit (TXD)
 			-- INPUTs
-			mclk :  in std_logic;	-- openMSP430_fpga_top system clock
+			mclk :  in std_logic;	-- main system clock
 			per_addr :  in std_logic_vector(PER_MSB  downto 0  );	-- Peripheral address
 			per_din :  in std_logic_vector( 15  downto 0  );	-- Peripheral data input
 			per_en :  in std_logic;	-- Peripheral enable (high active)
 			per_we :  in std_logic_vector( 1  downto 0  );	-- Peripheral write enable (high active)
-			puc_rst :  in std_logic;	-- openMSP430_fpga_top system reset
+			puc_rst :  in std_logic;	-- main system reset
 			smclk_en :  in std_logic;	-- SMCLK enable (from CPU)
 			uart_rxd :  in std_logic	-- UART Data Receive (RXD)
 		);
@@ -668,10 +668,10 @@ begin
 
 
 	-- Serial Ports
-	hw_uart_rxd	<= GPIO_0_in(0);
+	hw_uart_rxd	<= GPIO_0_IN(0);
 	GPIO_0(0)	<= hw_uart_txd;
 	
-	dbg_uart_rxd	<= GPIO_0_in(1);
+	dbg_uart_rxd	<= GPIO_0_IN(1);
 	GPIO_0(1)	<= dbg_uart_txd;
 
 end RTL;
