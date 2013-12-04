@@ -37,7 +37,7 @@ architecture rtl of template_periph_16b is
 	constant CNTRL4_O : natural range 0 to 2**DEC_WD - 1 := 16#6# ;
 	-- Register one-hot decoder utilities
 	constant DEC_SZ : natural := 2**DEC_WD ;
-	constant BASE_REG : unsigned( ( DEC_SZ - 1 ) downto 0 ) := ( ( DEC_SZ - 1 ) downto 1 => '0', 0 => '1');
+	constant BASE_REG : unsigned( ( DEC_SZ - 1 ) downto 0 ) := to_unsigned(1, DEC_SZ);
 	-- Register one-hot decoder
 	constant CNTRL1_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL1_O );
 	constant CNTRL2_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL2_O );
@@ -93,10 +93,10 @@ begin
 	PROC_CNTRL1: process begin
 		wait until (rising_edge(mclk));
 		
-		if ( puc_rst ) then -- synchronous reset
+		if ( puc_rst = '1' ) then -- synchronous reset
 			cntrl1 <= X"0000" ;
 		else 
-			if ( cntrl1_wr ) then 
+			if ( cntrl1_wr = '1' ) then
 				cntrl1 <= per_din;
 			end if;
 		end if;
@@ -108,10 +108,10 @@ begin
 	PROC_CNTRL2: process begin
 		wait until (rising_edge(mclk));
 		
-		if ( puc_rst ) then -- synchronous reset
+		if ( puc_rst = '1' ) then -- synchronous reset
 			cntrl2 <= X"0000" ;
 		else 
-			if ( cntrl2_wr ) then 
+			if ( cntrl2_wr = '1' ) then
 				cntrl2 <= per_din;
 			end if;
 		end if;
@@ -123,10 +123,10 @@ begin
 	PROC_CNTRL3: process begin
 		wait until (rising_edge(mclk));
 		
-		if ( puc_rst ) then -- synchronous reset
+		if ( puc_rst = '1' ) then -- synchronous reset
 			cntrl3 <= X"0000" ;
 		else 
-			if ( cntrl3_wr ) then 
+			if ( cntrl3_wr = '1' ) then
 				cntrl3 <= per_din;
 			end if;
 		end if;
@@ -138,10 +138,10 @@ begin
 	PROC_CNTRL4: process begin
 		wait until (rising_edge(mclk));
 		
-		if ( puc_rst ) then -- synchronous reset
+		if ( puc_rst = '1' ) then -- synchronous reset
 			cntrl4 <= X"0000" ;
 		else 
-			if ( cntrl4_wr ) then 
+			if ( cntrl4_wr = '1' ) then 
 				cntrl4 <= per_din;
 			end if;
 		end if;
@@ -156,6 +156,6 @@ begin
 	cntrl4_rd <= ( cntrl4 and ( per_dout'range => reg_rd(CNTRL4_O) ) ) ;
 
 	per_dout <=  ( cntrl1_rd or cntrl2_rd or cntrl3_rd or cntrl4_rd ) ;
-end; 
+end architecture; 
 
 
