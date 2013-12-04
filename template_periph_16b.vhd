@@ -1,5 +1,7 @@
 -- 16 bit peripheral template
--- 	based on template_periph_16b.v
+-- 	modelled in VHDL after template_periph_16b.v of the openMSP430 project
+--		this code should be seen more as Verilog to VHDL conversion example,
+--		as a real-world implementation
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -27,7 +29,7 @@ entity template_periph_16b is
 end entity; 
 
 architecture rtl of template_periph_16b is
-	constant 		BASE_ADDR_SLV : std_logic_vector( PER_MSB + 1 downto 0 ) := std_logic_vector(to_unsigned(BASE_ADDR, PER_MSB+2));
+	constant BASE_ADDR_SLV : std_logic_vector( PER_MSB + 1 downto 0 ) := std_logic_vector(to_unsigned(BASE_ADDR, PER_MSB+2));
 	-- Register addresses offset
 	constant CNTRL1_O : natural range 0 to 2**DEC_WD - 1 := 16#0# ;
 	constant CNTRL2_O : natural range 0 to 2**DEC_WD - 1 := 16#2# ;
