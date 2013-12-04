@@ -150,10 +150,10 @@ begin
 	-- DATA OUTPUT GENERATION
 		
 	-- Data output mux
-	cntrl1_rd <= ( cntrl1 and ( reg_rd'range => reg_rd(CNTRL1_O) ) ) ;
-	cntrl2_rd <= ( cntrl2 and ( reg_rd'range => reg_rd(CNTRL2_O) ) ) ;	
-	cntrl3_rd <= ( cntrl3 and ( reg_rd'range => reg_rd(CNTRL3_O) ) ) ;
-	cntrl4_rd <= ( cntrl4 and ( reg_rd'range => reg_rd(CNTRL4_O) ) ) ;
+	cntrl1_rd <= ( cntrl1 and ( per_dout'range => reg_rd(CNTRL1_O) ) ) ;
+	cntrl2_rd <= ( cntrl2 and ( per_dout'range => reg_rd(CNTRL2_O) ) ) ;	
+	cntrl3_rd <= ( cntrl3 and ( per_dout'range => reg_rd(CNTRL3_O) ) ) ;
+	cntrl4_rd <= ( cntrl4 and ( per_dout'range => reg_rd(CNTRL4_O) ) ) ;
 
 	per_dout <=  ( cntrl1_rd or cntrl2_rd or cntrl3_rd or cntrl4_rd ) ;
 end; 
