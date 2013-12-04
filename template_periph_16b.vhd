@@ -1,7 +1,4 @@
--- 16 bit peripheral template
--- 	modelled in VHDL after template_periph_16b.v of the openMSP430 project
---		this code should be seen more as Verilog to VHDL conversion example,
---		as a real-world implementation
+-- 16 bit peripheral template in VHDL for openMSP430
 
 library ieee;
 use ieee.std_logic_1164.all;
