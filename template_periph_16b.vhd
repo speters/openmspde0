@@ -16,7 +16,7 @@ entity template_periph_16b is
 		DEC_WD : natural := 3;
 		-- Register base address (must be aligned to decoder bit width)
 		BASE_ADDR :natural := 16#190#
-   );
+	);
 	port (
 		per_dout :  out std_logic_vector(15 downto 0);
 		mclk :  in std_logic;
