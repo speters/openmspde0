@@ -209,8 +209,8 @@ architecture RTL of openMSP430_fpga_top is
 	-- Simple full duplex UART (8N1 protocol)
 	component omsp_uart is
 		generic (
-			BASE_ADDR : inTEGER := 128 ; -- 16#0080# --	Register base address (must be aligned to decoder bit width)
-			DEC_WD : inTEGER := 3	-- Decoder bit width (defines how many bits are considered for address decoding)
+			BASE_ADDR : integer := 128 ; -- 16#0080# --	Register base address (must be aligned to decoder bit width)
+			DEC_WD : integer := 3	-- Decoder bit width (defines how many bits are considered for address decoding)
 		);
 		port (
 			-- OUTPUTs
@@ -229,6 +229,24 @@ architecture RTL of openMSP430_fpga_top is
 			uart_rxd :  in std_logic	-- UART Data Receive (RXD)
 		);
 	end component;
+	
+	component template_periph_16b is 
+	generic (
+		-- Decoder bit width (defines how many bits are considered for address decoding)
+		DEC_WD : natural := 3;
+		-- Register base address (must be aligned to decoder bit width)
+		BASE_ADDR : natural := 16#190#
+   );
+	port (
+		per_dout :  out std_logic_vector(15 downto 0);
+		mclk :  in std_logic;
+		per_addr :  in std_logic_vector( PER_MSB downto 0 );
+		per_din :  in std_logic_vector(15 downto 0);
+		per_en :  in std_logic;
+		per_we :  in std_logic_vector( 1 downto 0 );
+		puc_rst :  in std_logic
+	);
+	end component; 
 
 	component io_mux is
 		generic (WIDTH : natural := 8);
@@ -374,6 +392,8 @@ architecture RTL of openMSP430_fpga_top is
 	signal per_dout_uart : std_logic_vector(15 downto 0);
 	signal hw_uart_txd : std_logic;
 	signal hw_uart_rxd : std_logic;
+	
+	signal per_dout_testperiph : std_logic_vector(15 downto 0);
 
 begin
 	-- All inout port turn to tri-state
@@ -557,10 +577,22 @@ begin
 		smclk_en     => smclk_en,      -- SMCLK enable (from CPU)
 		uart_rxd     => hw_uart_rxd    -- UART Data Receive (RXD)
 	);
+	
+	testperiph:template_periph_16b 
+	port map(
+		per_dout     => per_dout_testperiph, -- Peripheral data output
+
+		mclk         => mclk,          -- main system clock
+		per_addr     => per_addr,      -- Peripheral address
+		per_din      => per_din,       -- Peripheral data input
+		per_en       => per_en,        -- Peripheral enable => high active)
+		per_we       => per_we,        -- Peripheral write enable (high active)
+		puc_rst      => puc_rst       -- main system reset
+	);
 
 	-- Combine peripheral data buses
 	---------------------------------
-	per_dout	<= per_dout_dio or per_dout_tA or per_dout_uart;
+	per_dout	<= per_dout_dio or per_dout_tA or per_dout_uart or per_dout_testperiph;
 
 	-- Assign interrupts
 	---------------------------------

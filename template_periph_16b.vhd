@@ -6,76 +6,100 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_misc.all;
 use ieee.numeric_std.all;
 
+use work.config.all;
+
 entity template_periph_16b is 
 	generic (
-		-- Register base address (must be aligned to decoder bit width)
-		BASE_ADDR : std_logic_vector( 14 downto 0 ) := x"0190" ;
 		-- Decoder bit width (defines how many bits are considered for address decoding)
-		DEC_WD : std_logic_vector := 3
+		DEC_WD : natural := 3;
+		-- Register base address (must be aligned to decoder bit width)
+		BASE_ADDR :natural := 16#190#
    );
 	port (
-		per_we :  in std_logic_vector( 1 downto 0 );
-		per_en :  in std_logic;
-		per_dout :  out std_logic_vector( per_dout'range ) := ( cntrl1_rd or cntrl2_rd or cntrl3_rd or cntrl4_rd ) ;
+		per_dout :  out std_logic_vector(15 downto 0);
 		mclk :  in std_logic;
-		per_addr :  in std_logic_vector( 13 downto 0 );
-		per_din :  in std_logic_vector( per_dout'range );
+		per_addr :  in std_logic_vector( PER_MSB downto 0 );
+		per_din :  in std_logic_vector(15 downto 0);
+		per_en :  in std_logic;
+		per_we :  in std_logic_vector( 1 downto 0 );
 		puc_rst :  in std_logic
 	);
 end entity; 
 
 architecture rtl of template_periph_16b is
-	-- Register one-hot decoder utilities
-	constant DEC_SZ : std_logic_vector := (1 sll DEC_WD) ;
-	constant BASE_REG : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( ( DEC_SZ - 1 ) downto 1 => '0', 0 => '1');
+	constant 		BASE_ADDR_SLV : std_logic_vector( PER_MSB + 1 downto 0 ) := std_logic_vector(to_unsigned(BASE_ADDR, PER_MSB+2));
 	-- Register addresses offset
-	constant CNTRL1 : std_logic_vector( ( DEC_WD - 1 ) downto 0 ) := x"0" ;
-	constant CNTRL2 : std_logic_vector( ( DEC_WD - 1 ) downto 0 ) := x"2" ;
-	constant CNTRL3 : std_logic_vector( ( DEC_WD - 1 ) downto 0 ) := x"4" ;
-	constant CNTRL4 : std_logic_vector( ( DEC_WD - 1 ) downto 0 ) := x"6";
+	constant CNTRL1_O : natural range 0 to 2**DEC_WD - 1 := 16#0# ;
+	constant CNTRL2_O : natural range 0 to 2**DEC_WD - 1 := 16#2# ;
+	constant CNTRL3_O : natural range 0 to 2**DEC_WD - 1 := 16#4# ;
+	constant CNTRL4_O : natural range 0 to 2**DEC_WD - 1 := 16#6# ;
+	-- Register one-hot decoder utilities
+	constant DEC_SZ : natural := 2**DEC_WD ;
+	constant BASE_REG : unsigned( ( DEC_SZ - 1 ) downto 0 ) := ( ( DEC_SZ - 1 ) downto 1 => '0', 0 => '1');
 	-- Register one-hot decoder
-	constant CNTRL1_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( BASE_REG sll CNTRL1 );
-	constant CNTRL2_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( BASE_REG sll CNTRL2 );
-	constant CNTRL3_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( BASE_REG sll CNTRL3 );
-	constant CNTRL4_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( BASE_REG sll CNTRL4 );
+	constant CNTRL1_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL1_O );
+	constant CNTRL2_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL2_O );
+	constant CNTRL3_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL3_O );
+	constant CNTRL4_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL4_O );
 	
 	-- Local register selection
-	signal reg_sel : std_logic := ( per_en and ( per_addr(per_addr'left downto ( DEC_WD - 1 ) ) = BASE_ADDR(BASE_ADDR'left downto DEC_WD) ) ) ;
+	signal reg_sel : std_logic;
 	-- Register local address
 	signal reg_addr : std_logic_vector( ( DEC_WD - 1 ) downto 0 ) := ( per_addr(( DEC_WD - 2 ) downto 0 ) & '0' );
 	-- Register address decode
-	signal reg_dec : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( ( CNTRL1_D and ( others => ( reg_addr = CNTRL1 ) ) )
-			or ( CNTRL2_D and ( others => ( reg_addr = CNTRL2 ) ) )
-			or ( CNTRL3_D and ( others => ( reg_addr = CNTRL3 ) ) )
-			or ( CNTRL4_D and ( others => ( reg_addr = CNTRL4 ) ) ) );
+	signal reg_dec : std_logic_vector( ( DEC_SZ - 1 ) downto 0 );
 	-- Read/Write probes
-	signal reg_write : std_logic := ( OR_REDUCE( per_we ) and reg_sel ) ;
-	signal reg_read : std_logic := ( NOR_REDUCE( per_we ) and reg_sel ) ;
+	signal reg_write : std_logic := (( per_we(1) or per_we(1)) and reg_sel ) ;
+	signal reg_read : std_logic := ( not( per_we(1) or per_we(1)) and reg_sel ) ;
 	-- Read/Write vectors
-	signal reg_wr : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( reg_dec and ( others => reg_write ) ) ;
-	signal reg_rd : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := ( reg_dec and ( others => reg_read ) ) ;
+	signal reg_wr : std_logic_vector( ( DEC_SZ - 1 ) downto 0 );
+	signal reg_rd : std_logic_vector( ( DEC_SZ - 1 ) downto 0 );
  	 
 	signal cntrl1 : std_logic_vector( per_dout'range );
-	signal cntrl1_wr : std_logic := reg_wr(CNTRL1);
-	signal cntrl1_rd : std_logic_vector( per_dout'range ) := ( cntrl1 and ( others => reg_rd(CNTRL1) ) ) ;
+	signal cntrl1_wr : std_logic;
+	signal cntrl1_rd : std_logic_vector( per_dout'range );
 	  
 	signal cntrl2 : std_logic_vector( per_dout'range );
-	signal cntrl2_wr : std_logic := reg_wr(CNTRL2);
-	signal cntrl2_rd : std_logic_vector( per_dout'range ) := ( cntrl2 and ( others => reg_rd(CNTRL2) ) ) ;
+	signal cntrl2_wr : std_logic;
+	signal cntrl2_rd : std_logic_vector( per_dout'range );
 	 
 	signal cntrl3 : std_logic_vector( per_dout'range );
-	signal cntrl3_wr : std_logic := reg_wr(CNTRL3);
-	signal cntrl3_rd : std_logic_vector( per_dout'range ) := ( cntrl3 and ( others => reg_rd(CNTRL3) ) ) ;
+	signal cntrl3_wr : std_logic;
+	signal cntrl3_rd : std_logic_vector( per_dout'range );
 	
 	signal cntrl4 : std_logic_vector( per_dout'range );
-	signal cntrl4_wr : std_logic := reg_wr(CNTRL4);
-	signal cntrl4_rd : std_logic_vector( per_dout'range ) := ( cntrl4 and ( others => reg_rd(CNTRL4) ) ) ;
+	signal cntrl4_wr : std_logic;
+	signal cntrl4_rd : std_logic_vector( per_dout'range );
 
-begin 
-	process begin
-		wait until (rising_edge(mclk)); -- (puc_rst treated as synced)
+begin
+	-- Local register selection
+	reg_sel <= per_en when ( per_addr(per_addr'left downto ( DEC_WD - 1 ) ) = BASE_ADDR_SLV(BASE_ADDR_SLV'left downto DEC_WD) ) else '0' ;
+	-- Register address decode
+	reg_dec <= ( ( CNTRL1_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL1_O, reg_addr'left) ) ) ) )
+			or ( CNTRL2_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL2_O, reg_addr'left) ) ) ) )
+			or ( CNTRL3_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL3_O, reg_addr'left) ) ) ) )
+			or ( CNTRL4_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL4_O, reg_addr'left) ) ) ) ) );
+			
+	-- Read/Write vectors
+	reg_wr <= ( reg_dec and ( reg_wr'range => reg_write ) ) ;
+	reg_rd <= ( reg_dec and ( reg_rd'range => reg_read ) ) ;
+ 	 
+	cntrl1_wr <= reg_wr(CNTRL1_O);
+	cntrl1_rd <= ( cntrl1 and ( reg_rd'range => reg_rd(CNTRL1_O) ) ) ;
+
+	cntrl2_wr <= reg_wr(CNTRL2_O);
+	cntrl2_rd <= ( cntrl2 and ( reg_rd'range => reg_rd(CNTRL2_O) ) ) ;	
+	
+	cntrl3_wr <= reg_wr(CNTRL3_O);
+	cntrl3_rd <= ( cntrl3 and ( reg_rd'range => reg_rd(CNTRL3_O) ) ) ;
 		
-		if ( puc_rst ) then 
+	cntrl4_wr <= reg_wr(CNTRL4_O);
+	cntrl4_rd <= ( cntrl4 and ( reg_rd'range => reg_rd(CNTRL4_O) ) ) ;
+
+	process begin
+		wait until (rising_edge(mclk));
+		
+		if ( puc_rst ) then -- synchronous reset
 			cntrl1 <= X"0000" ;
 		else 
 			if ( cntrl1_wr ) then 
@@ -85,9 +109,9 @@ begin
 	end process;
 	
 	process begin
-		wait until (rising_edge(mclk)); -- (puc_rst treated as synced)
+		wait until (rising_edge(mclk));
 		
-		if ( puc_rst ) then 
+		if ( puc_rst ) then -- synchronous reset
 			cntrl2 <= X"0000" ;
 		else 
 			if ( cntrl2_wr ) then 
@@ -97,9 +121,9 @@ begin
 	end process;
 	
 	process begin
-		wait until (rising_edge(mclk)); -- (puc_rst treated as synced)
+		wait until (rising_edge(mclk));
 		
-		if ( puc_rst ) then 
+		if ( puc_rst ) then -- synchronous reset
 			cntrl3 <= X"0000" ;
 		else 
 			if ( cntrl3_wr ) then 
@@ -109,9 +133,9 @@ begin
 	end process;
 	
 	process begin
-		wait until (rising_edge(mclk)); -- (puc_rst treated as synced)
+		wait until (rising_edge(mclk));
 		
-		if ( puc_rst ) then 
+		if ( puc_rst ) then -- synchronous reset
 			cntrl4 <= X"0000" ;
 		else 
 			if ( cntrl4_wr ) then 
@@ -119,6 +143,9 @@ begin
 			end if;
 		end if;
 	end process;
+	
+	-- Output generation
+	per_dout <=  ( cntrl1_rd or cntrl2_rd or cntrl3_rd or cntrl4_rd ) ;
 end; 
 
 
