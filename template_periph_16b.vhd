@@ -77,28 +77,20 @@ begin
 	-- Local register selection
 	reg_sel <= per_en when ( per_addr(per_addr'left downto ( DEC_WD - 1 ) ) = BASE_ADDR_SLV(BASE_ADDR_SLV'left downto DEC_WD) ) else '0' ;
 	-- Register address decode
-	reg_dec <= ( ( CNTRL1_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL1_O, reg_addr'left) ) ) ) )
-			or ( CNTRL2_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL2_O, reg_addr'left) ) ) ) )
-			or ( CNTRL3_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL3_O, reg_addr'left) ) ) ) )
-			or ( CNTRL4_D and ( reg_dec'range => AND_REDUCE( reg_addr and std_logic_vector(to_unsigned(CNTRL4_O, reg_addr'left) ) ) ) ) );
-			
+	reg_dec <= 	CNTRL1_D when (reg_addr = CNTRL1) else
+					CNTRL2_D when (reg_addr = CNTRL2) else
+					CNTRL3_D when (reg_addr = CNTRL3) else
+					CNTRL4_D when (reg_addr = CNTRL4) else
+					(reg_dec'range => '0');
+	
 	-- Read/Write vectors
 	reg_wr <= ( reg_dec and ( reg_wr'range => reg_write ) ) ;
 	reg_rd <= ( reg_dec and ( reg_rd'range => reg_read ) ) ;
  	 
+	-- CNTRL1 Register
 	cntrl1_wr <= reg_wr(CNTRL1_O);
-	cntrl1_rd <= ( cntrl1 and ( reg_rd'range => reg_rd(CNTRL1_O) ) ) ;
 
-	cntrl2_wr <= reg_wr(CNTRL2_O);
-	cntrl2_rd <= ( cntrl2 and ( reg_rd'range => reg_rd(CNTRL2_O) ) ) ;	
-	
-	cntrl3_wr <= reg_wr(CNTRL3_O);
-	cntrl3_rd <= ( cntrl3 and ( reg_rd'range => reg_rd(CNTRL3_O) ) ) ;
-		
-	cntrl4_wr <= reg_wr(CNTRL4_O);
-	cntrl4_rd <= ( cntrl4 and ( reg_rd'range => reg_rd(CNTRL4_O) ) ) ;
-
-	process begin
+	PROC_CNTRL1: process begin
 		wait until (rising_edge(mclk));
 		
 		if ( puc_rst ) then -- synchronous reset
@@ -109,8 +101,11 @@ begin
 			end if;
 		end if;
 	end process;
-	
-	process begin
+
+	-- CNTRL2 Register
+	cntrl2_wr <= reg_wr(CNTRL2_O);
+		
+	PROC_CNTRL2: process begin
 		wait until (rising_edge(mclk));
 		
 		if ( puc_rst ) then -- synchronous reset
@@ -121,8 +116,11 @@ begin
 			end if;
 		end if;
 	end process;
+
+	-- CNTRL3 Register
+	cntrl3_wr <= reg_wr(CNTRL3_O);
 	
-	process begin
+	PROC_CNTRL3: process begin
 		wait until (rising_edge(mclk));
 		
 		if ( puc_rst ) then -- synchronous reset
@@ -133,8 +131,11 @@ begin
 			end if;
 		end if;
 	end process;
+
+	-- CNTRL4 Register
+	cntrl4_wr <= reg_wr(CNTRL4_O);
 	
-	process begin
+	PROC_CNTRL4: process begin
 		wait until (rising_edge(mclk));
 		
 		if ( puc_rst ) then -- synchronous reset
@@ -146,7 +147,14 @@ begin
 		end if;
 	end process;
 	
-	-- Output generation
+	-- DATA OUTPUT GENERATION
+		
+	-- Data output mux
+	cntrl1_rd <= ( cntrl1 and ( reg_rd'range => reg_rd(CNTRL1_O) ) ) ;
+	cntrl2_rd <= ( cntrl2 and ( reg_rd'range => reg_rd(CNTRL2_O) ) ) ;	
+	cntrl3_rd <= ( cntrl3 and ( reg_rd'range => reg_rd(CNTRL3_O) ) ) ;
+	cntrl4_rd <= ( cntrl4 and ( reg_rd'range => reg_rd(CNTRL4_O) ) ) ;
+
 	per_dout <=  ( cntrl1_rd or cntrl2_rd or cntrl3_rd or cntrl4_rd ) ;
 end; 
 
