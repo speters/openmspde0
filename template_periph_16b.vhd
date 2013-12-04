@@ -29,133 +29,48 @@ entity template_periph_16b is
 end entity; 
 
 architecture rtl of template_periph_16b is
-	constant BASE_ADDR_SLV : std_logic_vector( PER_MSB + 1 downto 0 ) := std_logic_vector(to_unsigned(BASE_ADDR, PER_MSB+2));
-	-- Register addresses offset
-	constant CNTRL1_O : natural range 0 to 2**DEC_WD - 1 := 16#0# ;
-	constant CNTRL2_O : natural range 0 to 2**DEC_WD - 1 := 16#2# ;
-	constant CNTRL3_O : natural range 0 to 2**DEC_WD - 1 := 16#4# ;
-	constant CNTRL4_O : natural range 0 to 2**DEC_WD - 1 := 16#6# ;
-	-- Register one-hot decoder utilities
-	constant DEC_SZ : natural := 2**DEC_WD ;
-	constant BASE_REG : unsigned( ( DEC_SZ - 1 ) downto 0 ) := to_unsigned(1, DEC_SZ);
-	-- Register one-hot decoder
-	constant CNTRL1_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL1_O );
-	constant CNTRL2_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL2_O );
-	constant CNTRL3_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL3_O );
-	constant CNTRL4_D : std_logic_vector( ( DEC_SZ - 1 ) downto 0 ) := std_logic_vector( BASE_REG sll CNTRL4_O );
+	constant BASE_ADDR_SLV : std_logic_vector( PER_MSB downto 0 ) := std_logic_vector(to_unsigned(BASE_ADDR, PER_MSB+1));
+	signal local_addr: unsigned(DEC_WD -2 downto 0) := unsigned(per_addr(DEC_WD -1 downto 1)); -- aligned to 16bit data width
 	
-	-- Local register selection
 	signal reg_sel : std_logic;
-	-- Register local address
-	signal reg_addr : std_logic_vector( ( DEC_WD - 1 ) downto 0 ) := ( per_addr(( DEC_WD - 2 ) downto 0 ) & '0' );
-	-- Register address decode
-	signal reg_dec : std_logic_vector( ( DEC_SZ - 1 ) downto 0 );
-	-- Read/Write probes
-	signal reg_write : std_logic := (( per_we(1) or per_we(1)) and reg_sel ) ;
-	signal reg_read : std_logic := ( not( per_we(1) or per_we(1)) and reg_sel ) ;
-	-- Read/Write vectors
-	signal reg_wr : std_logic_vector( ( DEC_SZ - 1 ) downto 0 );
-	signal reg_rd : std_logic_vector( ( DEC_SZ - 1 ) downto 0 );
- 	 
-	signal cntrl1 : std_logic_vector( per_dout'range );
-	signal cntrl1_wr : std_logic;
-	signal cntrl1_rd : std_logic_vector( per_dout'range );
-	  
-	signal cntrl2 : std_logic_vector( per_dout'range );
-	signal cntrl2_wr : std_logic;
-	signal cntrl2_rd : std_logic_vector( per_dout'range );
-	 
-	signal cntrl3 : std_logic_vector( per_dout'range );
-	signal cntrl3_wr : std_logic;
-	signal cntrl3_rd : std_logic_vector( per_dout'range );
+
+	constant DEC_SZ : natural := 2**(DEC_WD-1);	-- Decoder size/number of registers
+	signal reg_dec : unsigned( ( DEC_SZ - 1 ) downto 0 );
+	signal reg_wr : unsigned( ( DEC_SZ - 1 ) downto 0 );
+	signal reg_rd : unsigned( ( DEC_SZ - 1 ) downto 0 );
 	
-	signal cntrl4 : std_logic_vector( per_dout'range );
-	signal cntrl4_wr : std_logic;
-	signal cntrl4_rd : std_logic_vector( per_dout'range );
+	-- registers
+	type t_Register is array(0 to (DEC_SZ - 1) ) of unsigned(per_din'range);
+	signal Cntrl : t_Register;
+	signal Cntrl_rd : t_Register;
 
 begin
-	-- Local register selection
-	reg_sel <= per_en when ( per_addr(per_addr'left downto ( DEC_WD - 1 ) ) = BASE_ADDR_SLV(BASE_ADDR_SLV'left downto DEC_WD) ) else '0' ;
-	-- Register address decode
-	reg_dec <= 	CNTRL1_D when (reg_addr = CNTRL1) else
-					CNTRL2_D when (reg_addr = CNTRL2) else
-					CNTRL3_D when (reg_addr = CNTRL3) else
-					CNTRL4_D when (reg_addr = CNTRL4) else
-					(reg_dec'range => '0');
+	-- Test if this peripheral is addressed
+	reg_sel <= per_en when ( per_addr(PER_MSB downto DEC_WD ) = BASE_ADDR_SLV(PER_MSB downto DEC_WD) )
+				else '0';
 	
-	-- Read/Write vectors
-	reg_wr <= ( reg_dec and ( reg_wr'range => reg_write ) ) ;
-	reg_rd <= ( reg_dec and ( reg_rd'range => reg_read ) ) ;
- 	 
-	-- CNTRL1 Register
-	cntrl1_wr <= reg_wr(CNTRL1_O);
-
-	PROC_CNTRL1: process begin
-		wait until (rising_edge(mclk));
-		
-		if ( puc_rst = '1' ) then -- synchronous reset
-			cntrl1 <= X"0000" ;
-		else 
-			if ( cntrl1_wr = '1' ) then
-				cntrl1 <= per_din;
-			end if;
-		end if;
-	end process;
-
-	-- CNTRL2 Register
-	cntrl2_wr <= reg_wr(CNTRL2_O);
-		
-	PROC_CNTRL2: process begin
-		wait until (rising_edge(mclk));
-		
-		if ( puc_rst = '1' ) then -- synchronous reset
-			cntrl2 <= X"0000" ;
-		else 
-			if ( cntrl2_wr = '1' ) then
-				cntrl2 <= per_din;
-			end if;
-		end if;
-	end process;
-
-	-- CNTRL3 Register
-	cntrl3_wr <= reg_wr(CNTRL3_O);
+	g_reg1: for i in 0 to (DEC_SZ -1 ) generate
+		-- Address decoder
+		reg_dec(i) <= '1' when (to_integer(local_addr) = i) else '0';
+		reg_wr(i) <= (reg_sel and (per_we(0) or per_we(1))) when (to_integer(local_addr) = i) else '0';
+		reg_rd(i) <= reg_sel when (to_integer(local_addr) = i) else '0';
 	
-	PROC_CNTRL3: process begin
-		wait until (rising_edge(mclk));
-		
-		if ( puc_rst = '1' ) then -- synchronous reset
-			cntrl3 <= X"0000" ;
-		else 
-			if ( cntrl3_wr = '1' ) then
-				cntrl3 <= per_din;
+		p_reg1: process begin
+			wait until (rising_edge(mclk));
+			
+			if ( puc_rst = '1' ) then -- synchronous reset
+				Cntrl(i) <= (Cntrl(i)'range => '0') ;
+			else 
+				if ( reg_wr(i) = '1' ) then 
+					Cntrl(i) <= unsigned(per_din);
+				end if;
 			end if;
-		end if;
-	end process;
-
-	-- CNTRL4 Register
-	cntrl4_wr <= reg_wr(CNTRL4_O);
-	
-	PROC_CNTRL4: process begin
-		wait until (rising_edge(mclk));
+		end process;
 		
-		if ( puc_rst = '1' ) then -- synchronous reset
-			cntrl4 <= X"0000" ;
-		else 
-			if ( cntrl4_wr = '1' ) then 
-				cntrl4 <= per_din;
-			end if;
-		end if;
-	end process;
-	
-	-- DATA OUTPUT GENERATION
-		
-	-- Data output mux
-	cntrl1_rd <= ( cntrl1 and ( per_dout'range => reg_rd(CNTRL1_O) ) ) ;
-	cntrl2_rd <= ( cntrl2 and ( per_dout'range => reg_rd(CNTRL2_O) ) ) ;	
-	cntrl3_rd <= ( cntrl3 and ( per_dout'range => reg_rd(CNTRL3_O) ) ) ;
-	cntrl4_rd <= ( cntrl4 and ( per_dout'range => reg_rd(CNTRL4_O) ) ) ;
+		-- Output mux
+		Cntrl_rd(i) <= Cntrl(i) when (reg_rd(i) = '1') else (Cntrl_rd(i)'range => '0');
+	end generate;
 
-	per_dout <=  ( cntrl1_rd or cntrl2_rd or cntrl3_rd or cntrl4_rd ) ;
-end architecture; 
-
+	per_dout <=  std_logic_vector(Cntrl_rd(to_integer(local_addr)));
+end architecture rtl; 
 

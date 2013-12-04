@@ -60,7 +60,7 @@ begin
 	begin
 		puc_rst <= '1';
 		wait for clk_period;
-    puc_rst <= '0';
+		puc_rst <= '0';
 		wait for clk_period*2;
 		per_en <= '1';
 		per_addr <= std_logic_vector(to_unsigned(16#190#, PER_MSB+1));
