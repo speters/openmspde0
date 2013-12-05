@@ -81,7 +81,11 @@ begin
 		per_addr <= std_logic_vector(to_unsigned(16#190#, PER_MSB+1));
 		per_we <= "11";
 		per_din <= x"AAAA";
-		wait for clk_period*2;
+		wait for clk_period;
+
+		sim_info <= string_pad("read register 0", sim_info'length);
+		per_we <= "00";
+		wait for clk_period;
 		
 		sim_info <= string_pad("try to write to register 0 with we=0 (must fail)", sim_info'length);
 		per_we <= "00";
@@ -98,6 +102,22 @@ begin
 		per_addr <= std_logic_vector(to_unsigned(16#190#, PER_MSB+1));
 		per_we <= "00";
 		per_din <= x"00FF";
+		wait for clk_period;
+		
+		sim_info <= string_pad("write to non-local addr", sim_info'length);
+		puc_rst <= '0';
+		per_en <= '1';
+		per_addr <= std_logic_vector(to_unsigned(16#180#, PER_MSB+1));
+		per_we <= "11";
+		per_din <= x"AAAA";
+		wait for clk_period;
+		
+		sim_info <= string_pad("read non-local addr", sim_info'length);
+		puc_rst <= '0';
+		per_en <= '1';
+		per_addr <= std_logic_vector(to_unsigned(16#180#, PER_MSB+1));
+		per_we <= "00";
+		per_din <= x"0000";
 		wait for clk_period;
 		
 		sim_info <= string_pad("disable peripheral", sim_info'length);

@@ -40,7 +40,6 @@ architecture rtl of template_periph_16b is
 	type t_Register is array(0 to (DEC_SZ - 1) ) of unsigned(per_din'range);
 	signal Cntrl : t_Register;
 	signal Cntrl_rd : t_Register;
-	signal Cntrl_wr : t_Register;
 
 begin
 	-- Test if this peripheral is addressed
@@ -56,16 +55,19 @@ begin
 		reg_wr(i) <= (reg_sel and (per_we(0) or per_we(1))) when (to_integer(local_addr) = i) else '0';
 		reg_rd(i) <= reg_sel when (to_integer(local_addr) = i) else '0';
 
-		Cntrl_wr(i) <= unsigned(per_din) when (reg_wr(i) = '1') else Cntrl(i);
+		-- Cntrl_wr(i) <= unsigned(per_din) when (reg_wr(i) = '1') else Cntrl(i);
 	
 		p_reg1: process begin
 			wait until (rising_edge(mclk));
-			
+		
 			if ( puc_rst = '1' ) then -- synchronous reset
 				Cntrl(i) <= (Cntrl(i)'range => '0') ;
-			else 
-				Cntrl(i) <= Cntrl_wr(i);
+			else
+				if (reg_wr(i) = '1') then
+					Cntrl(i) <= unsigned(per_din);
+				end if;
 			end if;
+
 		end process;
 		
 		-- Output mux
