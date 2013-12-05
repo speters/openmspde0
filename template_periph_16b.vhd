@@ -71,9 +71,11 @@ begin
 		end process;
 		
 		-- Output mux
-		Cntrl_rd(i) <= Cntrl(i) when (reg_rd(i) = '1') else (Cntrl_rd(i)'range => '0');
+		Cntrl_rd(i) <= Cntrl(i) when (reg_rd(i) = '1') else unsigned(per_din);
 	end generate;
 
-	per_dout <=  std_logic_vector(Cntrl_rd(to_integer(local_addr)));
+	per_dout <=  per_din when (reg_wr(to_integer(local_addr)) = '1')
+			else std_logic_vector(Cntrl_rd(to_integer(local_addr))) when (reg_rd(to_integer(local_addr)) = '1')
+			else (others => '0');
 end architecture rtl; 
 
