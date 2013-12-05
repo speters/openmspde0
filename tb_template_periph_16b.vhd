@@ -41,7 +41,7 @@ signal sim_info : string(1 to 64);
 
 function string_pad(instring: string; strlen: natural) return string is
 begin
-	return instring & (instring'length to strlen-1 => ' ');
+	return instring & (instring'length to strlen-1 => ' ');	-- character'val(0) as string terminator doesn't look nice
 end function;
 
 begin
@@ -116,6 +116,22 @@ begin
 		puc_rst <= '0';
 		per_en <= '1';
 		per_addr <= std_logic_vector(to_unsigned(16#180#, PER_MSB+1));
+		per_we <= "00";
+		per_din <= x"0000";
+		wait for clk_period;
+		
+		sim_info <= string_pad("read register 0", sim_info'length);
+		puc_rst <= '0';
+		per_en <= '1';
+		per_addr <= std_logic_vector(to_unsigned(16#190#, PER_MSB+1));
+		per_we <= "00";
+		per_din <= x"0000";
+		wait for clk_period;
+		
+		sim_info <= string_pad("read register 1", sim_info'length);
+		puc_rst <= '0';
+		per_en <= '1';
+		per_addr <= std_logic_vector(to_unsigned(16#192#, PER_MSB+1));
 		per_we <= "00";
 		per_din <= x"0000";
 		wait for clk_period;
