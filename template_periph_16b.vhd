@@ -39,15 +39,13 @@ architecture rtl of template_periph_16b is
 	-- registers
 	type t_Register is array(0 to (DEC_SZ - 1) ) of unsigned(per_din'range);
 	signal Cntrl : t_Register;
-	signal Cntrl_rd : t_Register;
 
 begin
 	-- Test if this peripheral is addressed
 	reg_sel <= per_en when ( per_addr(PER_MSB downto DEC_WD ) = BASE_ADDR_SLV(PER_MSB downto DEC_WD) )
 				else '0';
 
-	local_addr <= unsigned(per_addr(DEC_WD -1 downto 1)); -- aligned to 16bit data width
-
+	local_addr <= unsigned(per_addr(DEC_WD -1 downto 1)); -- 16bit data width, so cut off LSB
 	
 	g_reg1: for i in 0 to (DEC_SZ -1 ) generate
 		-- Address decoder
@@ -55,8 +53,6 @@ begin
 		reg_wr(i) <= (reg_sel and (per_we(0) or per_we(1))) when (to_integer(local_addr) = i) else '0';
 		reg_rd(i) <= reg_sel when (to_integer(local_addr) = i) else '0';
 
-		-- Cntrl_wr(i) <= unsigned(per_din) when (reg_wr(i) = '1') else Cntrl(i);
-	
 		p_reg1: process begin
 			wait until (rising_edge(mclk));
 		
@@ -69,12 +65,9 @@ begin
 			end if;
 
 		end process;
-		
-		-- Output mux
-		--Cntrl_rd(i) <= Cntrl(i) when (reg_rd(i) = '1') else unsigned(per_din);
 	end generate;
 
-	per_dout <=  per_din when (reg_wr(to_integer(local_addr)) = '1') else 	-- mirror per_in to per_out on write ops
+	per_dout <=  per_din when (reg_wr(to_integer(local_addr)) = '1') else 	-- mirror per_in to per_out on write ops TODO: needed?
 			std_logic_vector(Cntrl(to_integer(local_addr))) when (reg_rd(to_integer(local_addr)) = '1') else
 			(others => '0');
 end architecture rtl; 
