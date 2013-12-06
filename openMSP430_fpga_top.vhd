@@ -50,18 +50,22 @@ entity openMSP430_fpga_top is
 		ADC_SCLK 	: out std_logic;
 		ADC_SDAT 	: in std_logic;
 
-		--//////////// GPIO //////////
-		-- //////////// upper GPIO header //////////
-		GPIO_0		: inout std_logic_vector(33 downto 0);
-		GPIO_0_IN 	: in std_logic_vector(1 downto 0);
-
-		-- //////////// lower GPIO header //////////			
-		GPIO_1		: out std_logic_vector(33 downto 0);	  
-		GPIO_1_IN 	: in std_logic_vector(1 downto 0);
-
-		-- //////////// 2x13 GPIO header //////////
-		GPIO_2 		  : inout std_logic_vector(12 downto 0);
-		GPIO_2_IN 	: in std_logic_vector(2 downto 0)
+		-- UART/DBG peripheral (FT232 module connected on JP1 pins 2 4=TxD 6=RxD 8=N/C 10 12=GND)
+		UART0_RXD	: in std_logic;
+		UART0_TXD	: out std_logic
+		
+--		--//////////// GPIO //////////
+--		-- //////////// upper GPIO header //////////
+--		GPIO_0		: inout std_logic_vector(33 downto 0);
+--		GPIO_0_IN 	: in std_logic_vector(1 downto 0);
+--
+--		-- //////////// lower GPIO header //////////			
+--		GPIO_1		: out std_logic_vector(33 downto 0);	  
+--		GPIO_1_IN 	: in std_logic_vector(1 downto 0);
+--
+--		-- //////////// 2x13 GPIO header //////////
+--		GPIO_2 		  : inout std_logic_vector(12 downto 0);
+--		GPIO_2_IN 	: in std_logic_vector(2 downto 0)
 	);
 end openMSP430_fpga_top;
 
@@ -394,13 +398,14 @@ architecture RTL of openMSP430_fpga_top is
 	signal hw_uart_rxd : std_logic;
 	
 	signal per_dout_testperiph : std_logic_vector(15 downto 0);
-
+	
 begin
 	-- All inout port turn to tri-state
 	DRAM_DQ	<= (others => 'Z');
 	I2C_SDAT	<= 'Z';
-	GPIO_0	<= (others => 'Z');
-	GPIO_1	<= (others => 'Z');
+--	GPIO_0	<= (others => 'Z');
+--	GPIO_1	<= (others => 'Z');
+--	GPIO_2	<= (others => 'Z');
 
 	-- SDRAM blocking
 	DRAM_CS_N	<= '1';
@@ -696,14 +701,14 @@ begin
 	-- 7)  I/O CELLS
 	--=============================================================================
 	p3_din(7 downto 0) <= "0000" & SW(3 downto 0);
-	LED(7 downto 0)	<= (p3_dout(7 downto 2) AND p3_dout_en(7 downto 2)) & dbg_uart_rxd & dbg_uart_txd;
+	LED(7 downto 0)	<= (p3_dout(7 downto 2) AND p3_dout_en(7 downto 2)) & not(dbg_uart_rxd) & not(dbg_uart_txd);
 
 
 	-- Serial Ports
-	hw_uart_rxd	<= GPIO_0_IN(0);
-	GPIO_0(0)	<= hw_uart_txd;
+--	hw_uart_rxd	<= GPIO_0_IN(0);
+--	GPIO_0(2)	<= hw_uart_txd;
 	
-	dbg_uart_rxd	<= GPIO_0_IN(1);
-	GPIO_0(1)	<= dbg_uart_txd;
+	dbg_uart_rxd	<= UART0_RXD;
+	UART0_TXD	<= dbg_uart_txd;
 
 end RTL;

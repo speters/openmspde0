@@ -43,7 +43,7 @@
 //`define OMSP_NO_INCLUDE
 `ifdef OMSP_NO_INCLUDE
 `else
-`include "openMSP430_undefines.v"
+`include "external/opencores.org_-_openmsp430/core/rtl/verilog/openMSP430_undefines.v"
 `endif
 
 //============================================================================
@@ -189,7 +189,7 @@
 // when the program memory can only be initialized through
 // the serial debug interface.
 //-------------------------------------------------------
-`define DBG_RST_BRK_EN
+//`define DBG_RST_BRK_EN
 
 
 //============================================================================
@@ -792,7 +792,7 @@
 // If the following define is commented out, then
 // the DBG_UART_BAUD and DBG_DCO_FREQ need to be properly
 // defined.
-//`define DBG_UART_AUTO_SYNC
+`define DBG_UART_AUTO_SYNC
 
 // Debug UART interface data rate
 //      In order to properly setup the UART debug interface, you

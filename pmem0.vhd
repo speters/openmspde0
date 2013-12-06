@@ -97,7 +97,7 @@ BEGIN
 		byte_size => 8,
 		clock_enable_input_a => "NORMAL",
 		clock_enable_output_a => "BYPASS",
-		init_file => "../omsp_testproj/hello_world_0.hex",
+		init_file => "./msp430_software/memledtest.mif",
 		intended_device_family => "Cyclone IV E",
 		lpm_hint => "ENABLE_RUNTIME_MOD=YES,INSTANCE_NAME=PMEM",
 		lpm_type => "altsyncram",
@@ -147,7 +147,7 @@ END SYN;
 -- Retrieval info: PRIVATE: JTAG_ENABLED NUMERIC "1"
 -- Retrieval info: PRIVATE: JTAG_ID STRING "PMEM"
 -- Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
--- Retrieval info: PRIVATE: MIFfilename STRING "../omsp_testproj/hello_world_0.hex"
+-- Retrieval info: PRIVATE: MIFfilename STRING "./msp430_software/memledtest.mif"
 -- Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "2048"
 -- Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "0"
 -- Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_PORT_A NUMERIC "3"
@@ -165,7 +165,7 @@ END SYN;
 -- Retrieval info: CONSTANT: BYTE_SIZE NUMERIC "8"
 -- Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "NORMAL"
 -- Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
--- Retrieval info: CONSTANT: INIT_FILE STRING "../omsp_testproj/hello_world_0.hex"
+-- Retrieval info: CONSTANT: INIT_FILE STRING "./msp430_software/memledtest.mif"
 -- Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone IV E"
 -- Retrieval info: CONSTANT: LPM_HINT STRING "ENABLE_RUNTIME_MOD=YES,INSTANCE_NAME=PMEM"
 -- Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"

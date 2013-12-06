@@ -51,11 +51,6 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
 #set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/altera_de1_board/rtl/verilog/io_mux.v"
 #set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/xilinx_diligent_s3board/rtl/verilog/omsp_uart.v"
-set_global_assignment -name VERILOG_FILE "openMSP430.v"
-set_global_assignment -name SDC_FILE openmspde0.out.sdc
-set_global_assignment -name VHDL_FILE openMSP430_fpga_top.vhd
-set_global_assignment -name QIP_FILE dmem0.qip
-set_global_assignment -name QIP_FILE pmem0.qip
 #set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog/periph"
 #set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog"
 
@@ -146,9 +141,7 @@ set_location_assignment PIN_M16 -to GPIO_2_IN[2]
 set_location_assignment PIN_A8 -to GPIO_0_IN[0]
 set_location_assignment PIN_D3 -to GPIO_0[0]
 set_location_assignment PIN_B8 -to GPIO_0_IN[1]
-set_location_assignment PIN_C3 -to GPIO_0[1]
 set_location_assignment PIN_A2 -to GPIO_0[2]
-set_location_assignment PIN_A3 -to GPIO_0[3]
 set_location_assignment PIN_B3 -to GPIO_0[4]
 set_location_assignment PIN_B4 -to GPIO_0[5]
 set_location_assignment PIN_A4 -to GPIO_0[6]
@@ -309,9 +302,7 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2[10]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2[11]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2[12]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[0]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[1]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[2]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[3]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[4]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[5]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[6]
@@ -383,8 +374,6 @@ set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
 
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DRAM_DQM
-set_global_assignment -name SDC_FILE openmspde0.sdc
-set_global_assignment -name VHDL_FILE config.vhd
 
 
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0_IN[1]
@@ -395,11 +384,23 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2_IN[1]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2_IN[2]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2_IN[0]
 
-set_global_assignment -name VHDL_FILE template_periph_16b.vhd
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
-set_global_assignment -name VHDL_FILE tb_template_periph_16b.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VERILOG_FILE openMSP430_defines.v
+set_global_assignment -name VERILOG_FILE openMSP430.v
+set_global_assignment -name SDC_FILE openmspde0.out.sdc
+set_global_assignment -name VHDL_FILE openMSP430_fpga_top.vhd
+set_global_assignment -name QIP_FILE dmem0.qip
+set_global_assignment -name QIP_FILE pmem0.qip
+set_global_assignment -name SDC_FILE openmspde0.sdc
+set_global_assignment -name VHDL_FILE config.vhd
+set_global_assignment -name VHDL_FILE template_periph_16b.vhd
+set_global_assignment -name VHDL_FILE tb_template_periph_16b.vhd
+set_location_assignment PIN_C3 -to UART0_TXD
+set_location_assignment PIN_A3 -to UART0_RXD
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UART0_TXD
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UART0_RXD
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
