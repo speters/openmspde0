@@ -26,8 +26,8 @@ entity template_periph_16b is
 end entity; 
 
 architecture rtl of template_periph_16b is
-	constant BASE_ADDR_SLV : std_logic_vector( PER_MSB downto 0 ) := std_logic_vector(to_unsigned(BASE_ADDR, PER_MSB+1));
-	signal local_addr: unsigned(DEC_WD -2 downto 0);
+	constant BASE_ADDR_SLV : std_logic_vector( PER_MSB+1 downto 0 ) := std_logic_vector(to_unsigned(BASE_ADDR, PER_MSB+2));
+	signal local_addr: unsigned(DEC_WD -1 downto 0);
 	
 	signal reg_sel : std_logic;
 
@@ -42,10 +42,10 @@ architecture rtl of template_periph_16b is
 
 begin
 	-- Test if this peripheral is addressed
-	reg_sel <= per_en when ( per_addr(PER_MSB downto DEC_WD ) = BASE_ADDR_SLV(PER_MSB downto DEC_WD) )
+	reg_sel <= per_en when ( per_addr(PER_MSB downto DEC_WD ) = BASE_ADDR_SLV(PER_MSB+1 downto DEC_WD+1) )
 				else '0';
 
-	local_addr <= unsigned(per_addr(DEC_WD -1 downto 1)); -- 16bit data width, so cut off LSB
+	local_addr <= unsigned(per_addr(DEC_WD -1 downto 0)); -- 16bit data width, so cut off LSB
 	
 	g_reg1: for i in 0 to (DEC_SZ -1 ) generate
 		-- Address decoder

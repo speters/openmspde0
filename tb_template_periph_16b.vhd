@@ -27,7 +27,8 @@ architecture tb of tb_template_periph_16b is
 	
 signal per_dout : std_logic_vector(15 downto 0);
 signal mclk : std_logic := '0';
-signal per_addr : std_logic_vector( PER_MSB downto 0 );
+signal addr : std_logic_vector( 15 downto 0 );
+alias per_addr : std_logic_vector( PER_MSB downto 0 ) is addr(PER_MSB+1 downto 1);
 signal per_din : std_logic_vector(15 downto 0) := (others => '0');
 signal per_en :  std_logic := '0';
 signal per_we : std_logic_vector( 1 downto 0 ) := "00";
@@ -78,7 +79,7 @@ begin
 		sim_info <= string_pad("write to register 0", sim_info'length);
 		puc_rst <= '0';
 		per_en <= '1';
-		per_addr <= std_logic_vector(to_unsigned(16#190#, PER_MSB+1));
+		addr <= X"0190";
 		per_we <= "11";
 		per_din <= x"AAAA";
 		wait for clk_period;
@@ -94,12 +95,12 @@ begin
 		
 		sim_info <= string_pad("write to register 1 (offset 2)", sim_info'length);
 		per_we <= "11";
-		per_addr <= std_logic_vector(to_unsigned(16#192#, PER_MSB+1));
+		addr <= X"0192";
 		per_din <= x"FFF0";
 		wait for clk_period;
 		
 		sim_info <= string_pad("read back register 0", sim_info'length);
-		per_addr <= std_logic_vector(to_unsigned(16#190#, PER_MSB+1));
+		addr <= X"0190";
 		per_we <= "00";
 		per_din <= x"00FF";
 		wait for clk_period;
@@ -107,7 +108,7 @@ begin
 		sim_info <= string_pad("write to non-local addr", sim_info'length);
 		puc_rst <= '0';
 		per_en <= '1';
-		per_addr <= std_logic_vector(to_unsigned(16#180#, PER_MSB+1));
+		addr <= X"0180";
 		per_we <= "11";
 		per_din <= x"AAAA";
 		wait for clk_period;
@@ -115,7 +116,7 @@ begin
 		sim_info <= string_pad("read non-local addr", sim_info'length);
 		puc_rst <= '0';
 		per_en <= '1';
-		per_addr <= std_logic_vector(to_unsigned(16#180#, PER_MSB+1));
+		addr <= X"0180";
 		per_we <= "00";
 		per_din <= x"0000";
 		wait for clk_period;
@@ -123,7 +124,7 @@ begin
 		sim_info <= string_pad("read register 0", sim_info'length);
 		puc_rst <= '0';
 		per_en <= '1';
-		per_addr <= std_logic_vector(to_unsigned(16#190#, PER_MSB+1));
+		addr <= X"0190";
 		per_we <= "00";
 		per_din <= x"0000";
 		wait for clk_period;
@@ -131,7 +132,7 @@ begin
 		sim_info <= string_pad("read register 1", sim_info'length);
 		puc_rst <= '0';
 		per_en <= '1';
-		per_addr <= std_logic_vector(to_unsigned(16#192#, PER_MSB+1));
+		addr <= X"0192";
 		per_we <= "00";
 		per_din <= x"0000";
 		wait for clk_period;
