@@ -1,5 +1,5 @@
 -- timestamp peripheral for openMSP430
--- 	this instantiates timestamp component (needed for qcounters component) from Hostmot2
+-- 	this instantiates timestamp component (needed for qcounters component) from HostMot2
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -56,7 +56,6 @@ architecture rtl of periph_timestamp is
 	-- timestamp component signals
 	signal ibus : std_logic_vector(15 downto 0);
 	signal obus : std_logic_vector(15 downto 0);
-	-- alias loadts : std_logic is reg_wr(0);	-- not supported by timestamp component
 	alias loadtsdiv : std_logic is reg_wr(1);
 	alias readts : std_logic is reg_rd(0);
 	alias readtsdiv : std_logic is reg_rd(1);
@@ -72,8 +71,6 @@ begin
 		reg_dec(i) <= '1' when (to_integer(local_addr) = i) else '0';
 		reg_wr(i) <= (reg_sel and    (per_we(0) or per_we(1))) when (to_integer(local_addr) = i) else '0';
 		reg_rd(i) <= (reg_sel and not(per_we(0) or per_we(1))) when (to_integer(local_addr) = i) else '0';
-		--reg_rd(i) <= reg_sel  when (to_integer(local_addr) = i) else '0';
-
 	end generate;
 
 	per_dout <=  per_din when (per_we(0)='1' or per_we(1)='1') else 	-- mirror per_in to per_out on write ops TODO: needed?
@@ -93,20 +90,8 @@ begin
 			tscount => ts,
 			clk => mclk
 		);
-		
---	p_timestamp: process begin
---		wait until (rising_edge(mclk));
---	
---		if (readts = '1') then
---				register_tscount <= unsigned(obus);
---		end if;
---		if (readtsdiv = '1') then
---				register_tsdiv <= unsigned(obus);
---		end if;
---	end process;
-		
-	--ibus <= std_logic_vector(register_tsdiv) when (loadtsdiv = '1') else std_logic_vector(register_tscount); -- loading tscount is not supported by timestamp component, but it is supplied in case things change
-	ibus <= per_din when (reg_sel='1') else 
+	
+    ibus <= per_din when (reg_sel='1') else 
 				(others => '0');
 				
 	tscount <= ts;

@@ -47,7 +47,7 @@ begin
 
 	local_addr <= unsigned(per_addr(DEC_WD -1 downto 0)); -- 16bit data width, so cut off LSB
 	
-	g_reg1: for i in 0 to (DEC_SZ -1 ) generate
+	g_reg1: for i in 0 to (DEC_SZ -1 ) generate	-- FIXME: for decoder widths of 1!
 		-- Address decoder
 		reg_dec(i) <= '1' when (to_integer(local_addr) = i) else '0';
 		reg_wr(i) <= (reg_sel and (per_we(0) or per_we(1))) when (to_integer(local_addr) = i) else '0';
