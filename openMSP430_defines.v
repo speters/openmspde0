@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 180 $
+// $Rev: 192 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2013-02-25 22:23:18 +0100 (Mo, 25. Feb 2013) $
+// $LastChangedDate: 2013-12-17 21:15:28 +0100 (Di, 17. Dez 2013) $
 //----------------------------------------------------------------------------
 //`define OMSP_NO_INCLUDE
 `ifdef OMSP_NO_INCLUDE
@@ -139,6 +139,17 @@
 
 
 //-------------------------------------------------------
+// Number of available IRQs
+//-------------------------------------------------------
+// Indicates the number of interrupt vectors supported
+// (16, 32 or 64).
+//-------------------------------------------------------
+//`define IRQ_16
+//`define IRQ_32
+`define IRQ_64
+
+
+//-------------------------------------------------------
 // Input synchronizers
 //-------------------------------------------------------
 // In some cases, the asynchronous input ports might
@@ -189,7 +200,7 @@
 // when the program memory can only be initialized through
 // the serial debug interface.
 //-------------------------------------------------------
-//`define DBG_RST_BRK_EN
+`define DBG_RST_BRK_EN
 
 
 //============================================================================
@@ -630,6 +641,19 @@
 `define DMEM_MSB   `DMEM_AWIDTH-1
 `define PER_MSB    `PER_AWIDTH-1
 
+// Number of available IRQs
+`ifdef  IRQ_16
+`define IRQ_NR 16
+`endif
+`ifdef  IRQ_32
+`define IRQ_NR 32
+`define IRQ_NR_GE_32
+`endif
+`ifdef  IRQ_64
+`define IRQ_NR 64
+`define IRQ_NR_GE_32
+`endif
+
 //
 // STATES, REGISTER FIELDS, ...
 //======================================
@@ -792,7 +816,7 @@
 // If the following define is commented out, then
 // the DBG_UART_BAUD and DBG_DCO_FREQ need to be properly
 // defined.
-`define DBG_UART_AUTO_SYNC
+//`define DBG_UART_AUTO_SYNC
 
 // Debug UART interface data rate
 //      In order to properly setup the UART debug interface, you
@@ -851,6 +875,20 @@ CONFIGURATION ERROR: I2C OR UART DEBUG INTERFACE SHOULD BE ENABLED
 //======================================
 // CONFIGURATION CHECKS
 //======================================
+
+`ifdef  IRQ_16
+  `ifdef  IRQ_32
+CONFIGURATION ERROR: ONLY ONE OF THE IRQ NUMBER OPTION CAN BE SELECTED
+  `endif
+  `ifdef  IRQ_64
+CONFIGURATION ERROR: ONLY ONE OF THE IRQ NUMBER OPTION CAN BE SELECTED
+  `endif
+`endif
+`ifdef  IRQ_32
+  `ifdef  IRQ_64
+CONFIGURATION ERROR: ONLY ONE OF THE IRQ NUMBER OPTION CAN BE SELECTED
+  `endif
+`endif
 `ifdef LFXT_DOMAIN
 `else
  `ifdef MCLK_MUX

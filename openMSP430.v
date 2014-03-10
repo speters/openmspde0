@@ -1,5 +1,6 @@
 //=============================================================================
 // Configuration
+// Taken from external/opencores.org_-_openmsp430/core/rtl/verilog/openMSP430_defines.v
 // Keep in sync with config.vhd!
 //=============================================================================
 `define OMSP_NO_INCLUDE
