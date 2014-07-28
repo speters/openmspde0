@@ -18,7 +18,7 @@
 #
 # Quartus II 64-Bit
 # Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-# Date created = 11:43:38  November 14, 2013
+# Date created = 21:01:45  July 21, 2014
 #
 # -------------------------------------------------------------------------- #
 #
@@ -36,23 +36,27 @@
 # -------------------------------------------------------------------------- #
 
 
-set_global_assignment -name FAMILY "Cyclone IV E"
-set_global_assignment -name DEVICE EP4CE22F17C6
-set_global_assignment -name TOP_LEVEL_ENTITY openMSP430_fpga_top
+
+# Project-Wide Assignments
+# ========================
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "11:43:38  NOVEMBER 14, 2013"
 set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
-set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
-set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
-set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
-set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
-set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
-#set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/altera_de1_board/rtl/verilog/io_mux.v"
-#set_global_assignment -name VERILOG_FILE "../../dev/hdl/opencores.org_-_openmsp430/fpga/xilinx_diligent_s3board/rtl/verilog/omsp_uart.v"
-#set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog/periph"
-#set_global_assignment -name SEARCH_PATH "/home/soenke/dev/hdl/opencores.org_-_openmsp430/core/rtl/verilog"
+set_global_assignment -name VERILOG_FILE openMSP430_defines.v
+set_global_assignment -name VERILOG_FILE openMSP430.v
+set_global_assignment -name SDC_FILE openmspde0.out.sdc
+set_global_assignment -name VHDL_FILE openMSP430_fpga_top.vhd
+set_global_assignment -name QIP_FILE dmem0.qip
+set_global_assignment -name QIP_FILE pmem0.qip
+set_global_assignment -name SDC_FILE openmspde0.sdc
+set_global_assignment -name VHDL_FILE config.vhd
+set_global_assignment -name VHDL_FILE template_periph_16b.vhd
+set_global_assignment -name VHDL_FILE tb_template_periph_16b.vhd
+set_global_assignment -name VHDL_FILE "external/linuxcnc.org_-_hostmot2/timestamp.vhd"
+set_global_assignment -name VHDL_FILE periph_timestamp.vhd
+set_global_assignment -name VHDL_FILE tb_periph_timestamp.vhd
+set_global_assignment -name VHDL_FILE tb_timestamp.vhd
 
 # Pin & Location Assignments
 # ==========================
@@ -208,6 +212,8 @@ set_location_assignment PIN_J16 -to GPIO_1[30]
 set_location_assignment PIN_K15 -to GPIO_1[31]
 set_location_assignment PIN_J13 -to GPIO_1[32]
 set_location_assignment PIN_J14 -to GPIO_1[33]
+set_location_assignment PIN_C3 -to UART0_TXD
+set_location_assignment PIN_A3 -to UART0_RXD
 
 # Classic Timing Assignments
 # ==========================
@@ -215,8 +221,18 @@ set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 
+# Analysis & Synthesis Assignments
+# ================================
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name TOP_LEVEL_ENTITY openMSP430_fpga_top
+set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
+set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
+set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
+
 # Fitter Assignments
 # ==================
+set_global_assignment -name DEVICE EP4CE22F17C6
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
 set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
 set_global_assignment -name RESERVE_FLASH_NCE_AFTER_CONFIGURATION "USE AS REGULAR IO"
 set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
@@ -371,11 +387,8 @@ set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC_FOR_AREA ON
 set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
-
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DRAM_DQM
-
-
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0_IN[1]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0_IN[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1_IN[1]
@@ -383,28 +396,43 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_1_IN[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2_IN[1]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2_IN[2]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_2_IN[0]
-
-set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
-set_global_assignment -name VHDL_SHOW_LMF_MAPPING_MESSAGES OFF
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VERILOG_FILE openMSP430_defines.v
-set_global_assignment -name VERILOG_FILE openMSP430.v
-set_global_assignment -name SDC_FILE openmspde0.out.sdc
-set_global_assignment -name VHDL_FILE openMSP430_fpga_top.vhd
-set_global_assignment -name QIP_FILE dmem0.qip
-set_global_assignment -name QIP_FILE pmem0.qip
-set_global_assignment -name SDC_FILE openmspde0.sdc
-set_global_assignment -name VHDL_FILE config.vhd
-set_global_assignment -name VHDL_FILE template_periph_16b.vhd
-set_global_assignment -name VHDL_FILE tb_template_periph_16b.vhd
-set_location_assignment PIN_C3 -to UART0_TXD
-set_location_assignment PIN_A3 -to UART0_RXD
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UART0_TXD
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UART0_RXD
-set_global_assignment -name VHDL_FILE "external/linuxcnc.org_-_hostmot2/timestamp.vhd"
-set_global_assignment -name VHDL_FILE periph_timestamp.vhd
-set_global_assignment -name VHDL_FILE tb_periph_timestamp.vhd
-set_global_assignment -name VHDL_FILE tb_timestamp.vhd
+
+# EDA Netlist Writer Assignments
+# ==============================
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
+
+# Power Estimation Assignments
+# ============================
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+
+# start EDA_TOOL_SETTINGS(eda_simulation)
+# ---------------------------------------
+
+	# EDA Netlist Writer Assignments
+	# ==============================
+	set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
+
+# end EDA_TOOL_SETTINGS(eda_simulation)
+# -------------------------------------
+
+# ---------------------------------
+# start ENTITY(openMSP430_fpga_top)
+
+	# start DESIGN_PARTITION(Top)
+	# ---------------------------
+
+		# Incremental Compilation Assignments
+		# ===================================
+		set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+		set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+		set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+
+	# end DESIGN_PARTITION(Top)
+	# -------------------------
+
+# end ENTITY(openMSP430_fpga_top)
+# -------------------------------
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
