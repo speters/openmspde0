@@ -88,7 +88,7 @@ begin
 		per_en <= '1';
 		addr <= X"019A";
 		per_we <= "10";
-		per_din <= x"FFFF";
+		per_din <= x"0000";
 		wait for clk_period;
 		
 		sim_info <= string_pad("read register_tscount", sim_info'length);
@@ -124,11 +124,12 @@ begin
 		per_en <= '1';
 		addr <= X"019A";
 		per_we <= "11";
-		per_din <= x"7FFF";
+		per_din <= x"0004";
 		wait for clk_period;
 		
 		sim_info <= string_pad("see tscount counting", sim_info'length);
 		per_we <= "00";
+		addr <= X"0198";
 		wait for clk_period*5;
 		
 		sim_info <= string_pad("disable peripheral", sim_info'length);
